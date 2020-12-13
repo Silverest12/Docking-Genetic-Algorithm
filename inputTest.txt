@@ -1,0 +1,65 @@
+Nombre de navires = 10
+
+Nombre de postes d'amarrage = 4
+
+Dates d'arrivee des navires:
+N1  -> 4h
+N2  -> 7h30
+N3  -> 7h40
+N4  -> 13h10
+N5  -> 7h
+N6  -> 14h20
+N7  -> 8h20
+N8  -> 15h
+N9  -> 10h25
+N10 -> 9h50
+
+Duree de service des navires dans les postes d'amarrage:
+
+Poste1:
+N1  -> 140
+N2  -> 90
+N3  -> 150
+N4  -> 0
+N5  -> 0
+N6  -> 120
+N7  -> 90
+N8  -> 0
+N9  -> 110
+N10 -> 50
+
+Poste2:
+N1  -> 100
+N2  -> 80
+N3  -> 140
+N4  -> 50
+N5  -> 0
+N6  -> 60
+N7  -> 0
+N8  -> 50
+N9  -> 80
+N10 -> 40
+
+Poste3:
+N1  -> 80
+N2  -> 0
+N3  -> 100
+N4  -> 40
+N5  -> 60
+N6  -> 90
+N7  -> 50
+N8  -> 40
+N9  -> 60
+N10 -> 30
+
+Poste4:
+N1  -> 40
+N2  -> 80
+N3  -> 0
+N4  -> 120
+N5  -> 60
+N6  -> 0
+N7  -> 80
+N8  -> 80
+N9  -> 90
+N10 -> 0
