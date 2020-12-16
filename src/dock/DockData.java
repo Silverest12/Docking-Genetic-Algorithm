@@ -1,14 +1,16 @@
 package dock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class DockData {
-    private int nbrNvr;
-    private int nbrPst;
-    private HashMap<String, String> nvrTimeMap;
-    private HashMap<String, HashMap<String, Integer>> tmpService;
+    private final int nbrNvr;
+    private final int nbrPst;
+    private final HashMap<String, Integer> nvrTimeMap;
+    private final HashMap<String, HashMap<String, Integer>> tmpService;
 
-    private DockData (int nbrNvr, int nbrPst, HashMap<String, String> nvrTimeMap, HashMap<String, HashMap<String ,Integer>> tmpService) {
+    private DockData (int nbrNvr, int nbrPst, HashMap<String, Integer> nvrTimeMap, HashMap<String, HashMap<String ,Integer>> tmpService) {
         this.nbrNvr = nbrNvr;
         this.nbrPst = nbrPst;
         this.nvrTimeMap = nvrTimeMap;
@@ -18,7 +20,7 @@ public class DockData {
     public static class DockBuilder {
         private int nbrNvr;
         private int nbrPst;
-        private HashMap<String, String> nvrTimeMap;
+        private HashMap<String, Integer> nvrTimeMap;
         private HashMap<String, HashMap<String, Integer>> tmpService;
 
         public DockBuilder setNbrNvr(int nbrNvr) {
@@ -31,7 +33,7 @@ public class DockData {
             return this;
         }
 
-        public DockBuilder setNvrTimeMap(HashMap<String, String> nvrTimeMap) {
+        public DockBuilder setNvrTimeMap(HashMap<String, Integer> nvrTimeMap) {
             this.nvrTimeMap = nvrTimeMap;
             return this;
         }
@@ -46,36 +48,20 @@ public class DockData {
         }
     }
 
-    public void setNbrNvr(int nbrNvr) {
-        this.nbrNvr = nbrNvr;
+    public int getHeureArr (String idNavire) {
+        return nvrTimeMap.get(idNavire);
     }
 
-    public void setPostes(int nbrPst) {
-        this.nbrPst = nbrPst;
+    public int getDureeServ (String idNavire, String idPoste) {
+        return tmpService.get(idPoste).get(idNavire);
     }
 
-    public void setNvrTimeMap(HashMap<String, String> nvrTimeMap) {
-        this.nvrTimeMap = nvrTimeMap;
+    public List<String> getNaviresList () {
+        return new ArrayList<>(nvrTimeMap.keySet());
     }
 
-    public void setTmpService(HashMap<String, HashMap<String, Integer>> tmpService) {
-        this.tmpService = tmpService;
-    }
-
-    public int getNbrNvr() {
-        return nbrNvr;
-    }
-
-    public int getPostes() {
-        return nbrPst;
-    }
-
-    public HashMap<String, String> getNvrTimeMap() {
-        return nvrTimeMap;
-    }
-
-    public HashMap<String, HashMap<String, Integer>> getTmpService() {
-        return tmpService;
+    public List<String> getPostesList () {
+        return new ArrayList<>(tmpService.keySet());
     }
 
     @Override

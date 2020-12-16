@@ -1,5 +1,6 @@
 package dock;
 
+import geneticAlgorithm.Population;
 import utils.FileUtils;
 import utils.TextParser;
 
@@ -9,8 +10,12 @@ public class Main {
     public static void main(String[] arr) {
         Scanner in = new Scanner(System.in);
         String fileName = in.nextLine();
-        DockData dock = TextParser.convertTextToDoc(FileUtils.readFile(fileName));
-        System.out.println(dock);
         in.close();
+        DockData dock = TextParser.convertTextToDoc(FileUtils.readFile(fileName));
+
+        Population pop = new Population(4, dock);
+
+        pop.generatePop();
+        pop.print();
     }
 }

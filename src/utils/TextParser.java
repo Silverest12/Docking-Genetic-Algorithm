@@ -2,14 +2,9 @@ package utils;
 
 import dock.DockData;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class TextParser {
 
@@ -23,15 +18,20 @@ public class TextParser {
         return Integer.parseInt(output);
     }
 
-    private static HashMap<String, String> matcherToHashMap (Matcher toFind) {
-        HashMap<String, String> output = new HashMap<>();
+    private static HashMap<String, Integer> matcherToHashMap (Matcher toFind) {
+        HashMap<String, Integer> output = new HashMap<>();
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*->\\s*");
-            output.put(str[0], str[1]);
+            output.put(str[0], convertHourToMin (str[1]));
         }
 
         return output;
+    }
+
+    private static int convertHourToMin (String time) {
+        String[] timeSp = time.split("h");
+        return Integer.parseInt(timeSp[0]) * 60 + (timeSp.length >= 2? Integer.parseInt(timeSp[1]) : 0);
     }
 
     private static HashMap<String, Integer> matcherToHashMapInt (Matcher toFind) {
@@ -45,8 +45,8 @@ public class TextParser {
         return output;
     }
 
-    private static HashMap<String, String> matcherTempArr (Matcher toFind) {
-        HashMap<String, String>  output = new HashMap<>();
+    private static HashMap<String, Integer> matcherTempArr (Matcher toFind) {
+        HashMap<String, Integer>  output = new HashMap<>();
 
         if (toFind.find())
             output = matcherToHashMap(Pattern.compile("\\w+\\s*->\\s*\\d+h\\d*").matcher(toFind.group()));
@@ -74,11 +74,10 @@ public class TextParser {
         Pattern durPattern = Pattern.compile("(Poste\\d+\\s*:\\s*" +
                                                     "(\\w*\\s*->\\s*\\d+\\s*)+)", Pattern.CASE_INSENSITIVE);
 
-        dock.setNbrNvr(matcherToInt(nvrPattern.matcher(text)));
-        dock.setNbrPst(matcherToInt(pstPattern.matcher(text)));
-        dock.setNvrTimeMap(matcherTempArr(arrPattern.matcher(text)));
-        dock.setTmpService(matcherToDict(durPattern.matcher(text)));
-
-        return dock.build();
+        return dock.setNbrNvr(matcherToInt(nvrPattern.matcher(text)))
+                .setNbrPst(matcherToInt(pstPattern.matcher(text)))
+                .setNvrTimeMap(matcherTempArr(arrPattern.matcher(text)))
+                .setTmpService(matcherToDict(durPattern.matcher(text)))
+                .build();
     }
 }
