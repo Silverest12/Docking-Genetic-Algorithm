@@ -3,6 +3,7 @@ package utils;
 import dock.DockData;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,8 +19,8 @@ public class TextParser {
         return Integer.parseInt(output);
     }
 
-    private static HashMap<String, Integer> matcherToHashMap (Matcher toFind) {
-        HashMap<String, Integer> output = new HashMap<>();
+    private static LinkedHashMap<String, Integer> matcherToHashMap (Matcher toFind) {
+        LinkedHashMap<String, Integer> output = new LinkedHashMap<>();
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*->\\s*");
@@ -34,8 +35,8 @@ public class TextParser {
         return Integer.parseInt(timeSp[0]) * 60 + (timeSp.length >= 2? Integer.parseInt(timeSp[1]) : 0);
     }
 
-    private static HashMap<String, Integer> matcherToHashMapInt (Matcher toFind) {
-        HashMap<String, Integer> output = new HashMap<>();
+    private static LinkedHashMap<String, Integer> matcherToHashMapInt (Matcher toFind) {
+        LinkedHashMap<String, Integer> output = new LinkedHashMap<>();
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*->\\s*");
@@ -45,8 +46,8 @@ public class TextParser {
         return output;
     }
 
-    private static HashMap<String, Integer> matcherTempArr (Matcher toFind) {
-        HashMap<String, Integer>  output = new HashMap<>();
+    private static LinkedHashMap<String, Integer> matcherTempArr (Matcher toFind) {
+        LinkedHashMap<String, Integer>  output = new LinkedHashMap<>();
 
         if (toFind.find())
             output = matcherToHashMap(Pattern.compile("\\w+\\s*->\\s*\\d+h\\d*").matcher(toFind.group()));
@@ -54,8 +55,8 @@ public class TextParser {
         return output;
     }
 
-    private static HashMap<String, HashMap<String, Integer>> matcherToDict (Matcher toFind) {
-        HashMap<String, HashMap<String, Integer>> output = new HashMap<>();
+    private static LinkedHashMap<String, HashMap<String, Integer>> matcherToDict (Matcher toFind) {
+        LinkedHashMap<String, HashMap<String, Integer>> output = new LinkedHashMap<>();
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*:\\s*",2);

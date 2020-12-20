@@ -4,6 +4,7 @@ import geneticAlgorithm.Population;
 import utils.FileUtils;
 import utils.TextParser;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -13,10 +14,13 @@ public class Main {
         //in.close();
         String fileName = "inputTest.txt";
         DockData dock = TextParser.convertTextToDoc(FileUtils.readFile(fileName));
-
         Population pop = new Population(4, dock);
 
         pop.generatePop();
+        pop.print();
+
+        System.out.println("Apres croisement: ");
+        pop.croisement();
         pop.print();
     }
 }

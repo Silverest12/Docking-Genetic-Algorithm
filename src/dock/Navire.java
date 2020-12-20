@@ -4,8 +4,14 @@ public class Navire {
     private final String idNavire;
     private final int heureArr;
     private final int heureDeb;
-    private final int dureeServ;
-    //private int finServ;
+    private int dureeServ;
+
+    public Navire  () {
+        idNavire = "0";
+        heureArr = 0;
+        heureDeb = 0;
+        dureeServ = 0;
+    }
 
     public Navire (String id, int heureArr, int heureDeb, int dureeServ) {
        this.idNavire = id;
@@ -28,5 +34,14 @@ public class Navire {
 
     public int getDureeServ() {
         return dureeServ;
+    }
+
+    public void setDureeServ(int dureeServ) {
+        this.dureeServ = dureeServ;
+    }
+
+    @Override
+    public String toString() {
+        return idNavire + " ";
     }
 }

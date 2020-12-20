@@ -2,15 +2,16 @@ package dock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class DockData {
     private final int nbrNvr;
     private final int nbrPst;
-    private final HashMap<String, Integer> nvrTimeMap;
-    private final HashMap<String, HashMap<String, Integer>> tmpService;
+    private final LinkedHashMap<String, Integer> nvrTimeMap;
+    private final LinkedHashMap<String, HashMap<String, Integer>> tmpService;
 
-    private DockData (int nbrNvr, int nbrPst, HashMap<String, Integer> nvrTimeMap, HashMap<String, HashMap<String ,Integer>> tmpService) {
+    private DockData (int nbrNvr, int nbrPst, LinkedHashMap<String, Integer> nvrTimeMap, LinkedHashMap<String, HashMap<String ,Integer>> tmpService) {
         this.nbrNvr = nbrNvr;
         this.nbrPst = nbrPst;
         this.nvrTimeMap = nvrTimeMap;
@@ -20,8 +21,8 @@ public class DockData {
     public static class DockBuilder {
         private int nbrNvr;
         private int nbrPst;
-        private HashMap<String, Integer> nvrTimeMap;
-        private HashMap<String, HashMap<String, Integer>> tmpService;
+        private LinkedHashMap<String, Integer> nvrTimeMap;
+        private LinkedHashMap<String, HashMap<String, Integer>> tmpService;
 
         public DockBuilder setNbrNvr(int nbrNvr) {
             this.nbrNvr = nbrNvr;
@@ -33,12 +34,12 @@ public class DockData {
             return this;
         }
 
-        public DockBuilder setNvrTimeMap(HashMap<String, Integer> nvrTimeMap) {
+        public DockBuilder setNvrTimeMap(LinkedHashMap<String, Integer> nvrTimeMap) {
             this.nvrTimeMap = nvrTimeMap;
             return this;
         }
 
-        public DockBuilder setTmpService(HashMap<String, HashMap<String, Integer>> tmpService) {
+        public DockBuilder setTmpService(LinkedHashMap<String, HashMap<String, Integer>> tmpService) {
             this.tmpService = tmpService;
             return this;
         }
