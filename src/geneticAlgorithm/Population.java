@@ -4,6 +4,7 @@ import dock.DockData;
 import dock.Navire;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Population {
 
@@ -32,12 +33,16 @@ public class Population {
 
         DNA (List<Navire> listeNavire) {
             dnaMap = checkSubmittedList(listeNavire);
+            System.out.println(dnaMap);
+            swapOutDups();
         }
 
         private LinkedHashMap<String, List<Navire>> checkSubmittedList (List<Navire> listeNavire) {
             LinkedHashMap<String, List<Navire>> dnaMap = new LinkedHashMap<>();
 
-            for(String poste : postePool) {
+            for (String poste : postePool) {
+                listeNavire.forEach(System.out::print);
+                System.out.println("\n");
                 ArrayList<Navire> list = new ArrayList<>();
                 String lastId;
                 do {
@@ -55,10 +60,6 @@ public class Population {
             return dnaMap;
         }
 
-        public HashMap<String, List<Navire>> getDNA() {
-            return dnaMap;
-        }
-
         public int calcFitness () {
             int sum = 0;
             for (String p : dnaMap.keySet()) {
@@ -69,17 +70,91 @@ public class Population {
             return sum;
         }
 
-        private boolean checkIfOverlapped (List<Navire> listNvr, int startTime, int dureeServ) {
-            int finServ = startTime + dureeServ;
-            if (listNvr == null) return true;
-            else {
-                for (Navire n : listNvr) {
-                    if (n.getHeureDeb() <= startTime && startTime < n.getHeureDeb() + n.getDureeServ()
-                        && n.getHeureDeb() <= finServ && finServ < n.getHeureDeb() + n.getDureeServ())
-                        return false;
+        private List<String> identifyMissing (Set<String> setNvr) {
+            List<String> elemPoolCopy = new ArrayList<>(elemPool);
+            elemPoolCopy.removeAll(setNvr);
+            return elemPoolCopy;
+        }
+
+        private void swapOutDups () {
+            List<String> missingIds = identifyMissing(flatten().stream().map(Navire::getIdNavire).collect(Collectors.toSet()));
+            List<String> dups = checkForDups();
+
+            Random rand = new Random();
+
+            for (String p : dnaMap.keySet()) {
+                List<Navire> nvrList = dnaMap.get(p);
+                List<Integer> toRem = new LinkedList<>();
+                for (int i = 0; i < nvrList.size(); i++) {
+                   if (dups.contains(nvrList.get(i).getIdNavire())) {
+                       toRem.add(i);
+                   }
+                }
+                for (int x: toRem) {
+                    Navire backUpN = nvrList.get(x);
+                    dups.remove(nvrList.get(x).getIdNavire());
+                    nvrList.remove(x);
+                    Navire n = generateRandomNav(missingIds, rand, p);
+                    int heureDeb;
+                    do {
+                        heureDeb = rand.nextInt(1440 - n.getDureeServ());
+                    } while (heureDeb < n.getHeureArr() || checkIfOverlapped(nvrList, heureDeb, n.getDureeServ()));
+
+                    n.setHeureDeb(heureDeb);
+                    missingIds.remove(n.getIdNavire());
+                    if (n.getIdNavire().equals("0")) {
+                        dnaMap.get(p).add(backUpN);
+                    } else {
+                        dnaMap.get(p).add(n);
+                    }
                 }
             }
-            return true;
+        }
+
+        private List<String> checkForDups () {
+            Set<String> nvrSet = new HashSet<>();
+            List<String> toChange = new LinkedList<>();
+
+            for (String poste: dnaMap.keySet()) {
+                for (Navire nvr: dnaMap.get(poste)) {
+                    if(!nvrSet.add(nvr.getIdNavire())) {
+                      toChange.add(nvr.getIdNavire());
+                    }
+                }
+            }
+
+            return toChange;
+        }
+
+        private boolean checkIfOverlapped (List<Navire> listNvr, int startTime, int dureeServ) {
+            int finServ = startTime + dureeServ;
+            for (Navire n : listNvr) {
+                if (n.getHeureDeb() <= startTime && startTime < n.getHeureDeb() + n.getDureeServ()
+                        && n.getHeureDeb() <= finServ && finServ < n.getHeureDeb() + n.getDureeServ())
+                    return true;
+            }
+
+            return false;
+        }
+
+        private Navire generateRandomNav (List<String> elemPoolCopy, Random rand, String poste) {
+            String addr;
+            int heureArr;
+            int dureeServ;
+
+            int counter = 0;
+
+            do {
+                addr = elemPoolCopy.get(rand.nextInt(elemPoolCopy.size()));
+                heureArr = dockData.getHeureArr(addr);
+                dureeServ = dockData.getDureeServ(addr, poste);
+                if (counter > 5) {
+                    return new Navire();
+                }
+                counter ++;
+            } while (dureeServ == 0);
+
+            return new Navire(addr, heureArr, heureArr, dureeServ);
         }
 
         private LinkedHashMap<String, List<Navire>> firstGen () {
@@ -88,20 +163,10 @@ public class Population {
             Random rand = new Random();
 
             for (String poste : postePool) {
-                String addr;
-                int heureArr;
-                int dureeServ;
-
-                do {
-                    addr = elemPoolCopy.get(rand.nextInt(elemPoolCopy.size()));
-                    heureArr = dockData.getHeureArr(addr);
-                    dureeServ = dockData.getDureeServ(addr, poste);
-                } while (dureeServ == 0);
-
-                Navire n = new Navire(addr, heureArr, heureArr, dureeServ);
+                Navire n = generateRandomNav(elemPoolCopy, rand, poste);
                 dnaMap.put(poste, new ArrayList<>());
                 dnaMap.get(poste).add(n);
-                elemPoolCopy.remove(addr);
+                elemPoolCopy.remove(n.getIdNavire());
             }
 
             return dnaMap;
@@ -120,26 +185,21 @@ public class Population {
             Random rand = new Random();
             int mapSize = dnaMap.size();
             while (mapSize != elemLength) {
-                String addr;
                 String poste;
-                int dureeServ;
-                int heureDeb;
-
+                Navire n;
                 do {
-                    addr = elemPoolCopy.get(rand.nextInt(elemPoolCopy.size()));
                     poste = postePool.get(rand.nextInt(postePool.size()));
-                    dureeServ = dockData.getDureeServ(addr, poste);
-                } while (dureeServ == 0);
+                    n = generateRandomNav(elemPoolCopy, rand, poste);
+                } while (n.getIdNavire().equals("0"));
 
-                int heureArr = dockData.getHeureArr(addr);
-
+                int heureDeb;
                 do {
-                    heureDeb = rand.nextInt(1440 - dureeServ);
-                } while (heureDeb < heureArr || !checkIfOverlapped(dnaMap.get(poste), heureDeb, dureeServ));
+                    heureDeb = rand.nextInt(1440 - n.getDureeServ());
+                } while (heureDeb < n.getHeureArr() || checkIfOverlapped(dnaMap.get(poste), heureDeb, n.getDureeServ()));
 
-                Navire n = new Navire(addr, heureArr, heureDeb, dureeServ);
+                n.setHeureDeb(heureDeb);
                 dnaMap.get(poste).add(n);
-                elemPoolCopy.remove(addr);
+                elemPoolCopy.remove(n.getIdNavire());
                 mapSize ++;
             }
 
@@ -245,6 +305,7 @@ public class Population {
 
         DNA dna1 = new DNA(newDna1);
         DNA dna2 = new DNA(newDna2);
+
         popDNAs.put(dna1, dna1.calcFitness());
         popDNAs.put(dna2, dna2.calcFitness());
     }
@@ -264,16 +325,17 @@ public class Population {
 
         int j;
         do {
-            j = rand.nextInt(len1 / 2) + len1/2;
+            j = rand.nextInt(len1) / 2 + len1 / 2;
         } while (j == 0);
 
         int i;
         do {
-            i = rand.nextInt(len1 / 2);
+            i = rand.nextInt(len1) / 2;
         } while (j == i || i == 0);
 
         popDNAs.remove(dna1);
         popDNAs.remove(dna2);
+
         swapNChop(flattenedDna1, flattenedDna2, i, j);
     }
 

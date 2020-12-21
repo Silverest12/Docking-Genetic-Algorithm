@@ -17,10 +17,10 @@ public class Main {
         Population pop = new Population(4, dock);
 
         pop.generatePop();
-        pop.print();
+        //pop.print();
 
-        System.out.println("Apres croisement: ");
+        //System.out.println("\n\nApres croisement: ");
         pop.croisement();
-        pop.print();
+        //pop.print();
     }
 }

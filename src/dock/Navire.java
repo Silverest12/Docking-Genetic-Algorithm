@@ -2,8 +2,8 @@ package dock;
 
 public class Navire {
     private final String idNavire;
-    private final int heureArr;
-    private final int heureDeb;
+    private int heureArr;
+    private int heureDeb;
     private int dureeServ;
 
     public Navire  () {
@@ -34,6 +34,10 @@ public class Navire {
 
     public int getDureeServ() {
         return dureeServ;
+    }
+
+    public void setHeureDeb(int heureDeb) {
+        this.heureDeb = heureDeb;
     }
 
     public void setDureeServ(int dureeServ) {
