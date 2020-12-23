@@ -1,9 +1,6 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class FileUtils {
     public static String readFile(String fileName) {
@@ -19,5 +16,13 @@ public class FileUtils {
            e.printStackTrace();
        }
        return strBld.toString();
+    }
+
+    public static void writeToFile(String fileName, String outPut) throws IOException {
+        File f = new File(fileName);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+        bw.write(outPut);
+        bw.close();
     }
 }

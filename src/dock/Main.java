@@ -14,13 +14,18 @@ public class Main {
         //in.close();
         String fileName = "inputTest.txt";
         DockData dock = TextParser.convertTextToDoc(FileUtils.readFile(fileName));
-        Population pop = new Population(4, dock);
+        Population pop = new Population(8, dock);
 
         pop.generatePop();
-        //pop.print();
-
-        //System.out.println("\n\nApres croisement: ");
-        pop.croisement();
-        //pop.print();
+        System.out.println("gen 0 :");
+        pop.print();
+        System.out.println();
+        for (int i =1; i < 5; i++ ) {
+            pop.croisement();
+            pop.mutation();
+            System.out.println("gen " + i + " : ");
+            pop.print();
+            System.out.println();
+        }
     }
 }
