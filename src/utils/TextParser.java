@@ -24,7 +24,7 @@ public class TextParser {
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*->\\s*");
-            output.put(str[0], convertHourToMin (str[1]));
+            output.put(str[0].trim(), convertHourToMin (str[1]));
         }
 
         return output;
@@ -40,7 +40,7 @@ public class TextParser {
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*->\\s*");
-            output.put(str[0], Integer.parseInt(str[1]));
+            output.put(str[0].trim(), Integer.parseInt(str[1]));
         }
 
         return output;
@@ -60,7 +60,7 @@ public class TextParser {
 
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*:\\s*",2);
-            output.put(str[0], matcherToHashMapInt(Pattern.compile("\\w+\\s*->\\s*\\d+").matcher(str[1])));
+            output.put(str[0].trim(), matcherToHashMapInt(Pattern.compile("\\w+\\s*->\\s*\\d+").matcher(str[1])));
         }
 
         return output;

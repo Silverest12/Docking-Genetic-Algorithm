@@ -2,7 +2,7 @@ package dock;
 
 public class Navire {
     private final String idNavire;
-    private int heureArr;
+    private final int heureArr;
     private int heureDeb;
     private int dureeServ;
 
