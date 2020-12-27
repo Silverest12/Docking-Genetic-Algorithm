@@ -20,7 +20,7 @@ public class Main {
         System.out.println("gen 0 :");
         pop.print();
         System.out.println();
-        for (int i =1; i <= 4; i++ ) {
+        for (int i =1; i <= 10; i++ ) {
             pop.getNextGen();
             System.out.println("gen " + i + " : ");
             pop.print();

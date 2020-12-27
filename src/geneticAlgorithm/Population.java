@@ -99,9 +99,9 @@ public class Population {
         int i, j;
 
         do {
-            DNA dna1 = new ArrayList<>(dnaPool).get(rand.nextInt(dnaPool.size()));
+            DNA dna1 = dnaPool.get(rand.nextInt(dnaPool.size()));
             dnaPool.remove(dna1);
-            DNA dna2 = new ArrayList<>(dnaPool).get(rand.nextInt(dnaPool.size()));
+            DNA dna2 = dnaPool.get(rand.nextInt(dnaPool.size()));
             dnaPool.add(dna1);
 
             flattenedDna1 = dna1.flatten();
@@ -129,9 +129,10 @@ public class Population {
         System.out.println("Mutation de : \n" + dna.flatten() + "\n");
 
         DNA mutatedDna = DNA.mutate(dna);
-
-        popDNAs.put(mutatedDna, mutatedDna.calcFitness());
-        System.out.println("Resltat : \n" + mutatedDna.flatten() + "\n");
+        if(mutatedDna.isValid()) {
+            popDNAs.put(mutatedDna, mutatedDna.calcFitness());
+        }
+        System.out.println("Correction : \n" + mutatedDna.flatten() + "\n");
     }
 
     public void generatePop () {

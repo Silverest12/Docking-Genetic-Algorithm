@@ -63,8 +63,9 @@ public class DNA {
             dnaCopy.swapNvr(nvr1, nvr2, p1, p2);
 
             f = dnaCopy.flatten();
+            System.out.println("Resultat : \n" + f + "\n");
             dnaCopy.fixDna();
-        } while (!dnaCopy.isValid() || dnaCopy.isSame(f, dnaCopy.flatten()));
+        } while (!dnaCopy.isValid());
 
         return dnaCopy;
     }
@@ -106,15 +107,6 @@ public class DNA {
         } while (!dna.isValid());
 
         this.dnaMap = dna.dnaMap;
-    }
-
-    private boolean isSame (List<Navire> f1, List<Navire> f2) {
-        for (int i = 0; i < f1.size(); i++) {
-            if (!f1.get(i).getIdNavire().equals(f2.get(i).getIdNavire()))
-                return false;
-        }
-
-        return true;
     }
 
     private LinkedHashMap<String, List<Navire>> generateDNA () {
@@ -188,14 +180,14 @@ public class DNA {
     }
 
     private void swapNvr (Navire nvr1, Navire nvr2, String poste1, String poste2){
-        dnaMap.get(poste1).remove(nvr1);
-        dnaMap.get(poste2).remove(nvr2);
+        int id1 = dnaMap.get(poste1).indexOf(nvr1);
+        int id2 = dnaMap.get(poste2).indexOf(nvr2);
 
         nvr1.setDureeServ(dockData.getDureeServ(nvr1.getIdNavire(), poste2));
         nvr2.setDureeServ(dockData.getDureeServ(nvr2.getIdNavire(), poste1));
 
-        dnaMap.get(poste1).add(nvr2);
-        dnaMap.get(poste2).add(nvr1);
+        dnaMap.get(poste1).set(id1, nvr2);
+        dnaMap.get(poste2).set(id2, nvr1);
     }
 
     private void clearDups () {
