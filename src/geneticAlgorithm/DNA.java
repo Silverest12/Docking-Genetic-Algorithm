@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 public class DNA {
 
-    public static DNA fromListToDNA (List<Navire> listeNavire, List<String> postePool, DockData dockData) {
+    public static DNA fromListToDNA (List<Navire> listNavire, List<String> postePool, DockData dockData) {
         Map<String, List<Navire>> dnaMap = new LinkedHashMap<>();
+        List<Navire> listeNavire = new ArrayList<>(listNavire);
 
         for (String poste : postePool) {
             List<Navire> list = new ArrayList<>();
 
             String lastId;
-
             do {
                 Navire n = listeNavire.get(0);
                 listeNavire.remove(0);
@@ -33,7 +33,7 @@ public class DNA {
     }
 
     public static DNA copyOf(DNA dna) {
-        return new DNA(dna.getDockData(), dna.getDnaMap());
+        return new DNA(dna.getDockData(), new LinkedHashMap<>(dna.getDnaMap()));
     }
 
     public static DNA genRand(DockData dockData) {
@@ -42,6 +42,31 @@ public class DNA {
 
     public static DNA empty() {
         return null;
+    }
+
+    public static DNA mutate (DNA dna) {
+        DNA dnaCopy = DNA.copyOf(dna);
+        List<String> postePool = dnaCopy.postePool;
+        Random rand = new Random();
+        Map<String, List<Navire>> dnaMap = dnaCopy.getDnaMap();
+        List<Navire> f;
+
+        do {
+            String p1 = postePool.get(rand.nextInt(postePool.size()));
+            postePool.remove(p1);
+            String p2 = postePool.get(rand.nextInt(postePool.size()));
+            postePool.add(p1);
+
+            Navire nvr1 = dnaMap.get(p1).get(rand.nextInt(dnaMap.get(p1).size()));
+            Navire nvr2 = dnaMap.get(p2).get(rand.nextInt(dnaMap.get(p2).size()));
+
+            dnaCopy.swapNvr(nvr1, nvr2, p1, p2);
+
+            f = dnaCopy.flatten();
+            dnaCopy.fixDna();
+        } while (!dnaCopy.isValid() || dnaCopy.isSame(f, dnaCopy.flatten()));
+
+        return dnaCopy;
     }
 
     private Map<String, List<Navire>> dnaMap;
@@ -83,20 +108,13 @@ public class DNA {
         this.dnaMap = dna.dnaMap;
     }
 
-    public void mutate () {
-        String p1 = postePool.get(rand.nextInt(postePool.size()));
-        postePool.remove(p1);
-        String p2 = postePool.get(rand.nextInt(postePool.size()));
-        postePool.add(p1);
+    private boolean isSame (List<Navire> f1, List<Navire> f2) {
+        for (int i = 0; i < f1.size(); i++) {
+            if (!f1.get(i).getIdNavire().equals(f2.get(i).getIdNavire()))
+                return false;
+        }
 
-        Navire nvr1 = dnaMap.get(p1).get(rand.nextInt(dnaMap.get(p1).size()));
-        Navire nvr2 = dnaMap.get(p2).get(rand.nextInt(dnaMap.get(p2).size()));
-
-        swapNvr(nvr1, nvr2, p1, p2);
-
-        do {
-            fixDna();
-        } while (!isValid());
+        return true;
     }
 
     private LinkedHashMap<String, List<Navire>> generateDNA () {
@@ -181,28 +199,18 @@ public class DNA {
     }
 
     private void clearDups () {
-        int elemLen = elemPool.size();
-        
-        Set<String> dupsChecker = flatten().stream()
-                .map(Navire::getIdNavire)
-                .collect(Collectors.toSet());
-
-        int counter = 10;
-
-        while (dupsChecker.size() - 1 != elemLen && counter-- > 0) {
+        while (hasDups()) {
             Set<String> visited = new HashSet<>();
-            for(String poste: dnaMap.keySet()) {
+            for (String poste : dnaMap.keySet()) {
                 for (Navire nvr : dnaMap.get(poste)) {
                     if (visited.contains(nvr.getIdNavire())) {
                         Navire newNvr = putRandomNvr(poste, nvr.getIdNavire());
+                        int i = dnaMap.get(poste).indexOf(nvr);
+                        dnaMap.get(poste).set(i, newNvr);
                         visited.add(newNvr.getIdNavire());
                     } else visited.add(nvr.getIdNavire());
                 }
             }
-
-            dupsChecker = flatten().stream()
-                    .map(Navire::getIdNavire)
-                    .collect(Collectors.toSet());
         }
     }
 
@@ -225,6 +233,13 @@ public class DNA {
         }
     }
 
+    private boolean hasDups () {
+        return flatten().stream()
+                .map(Navire::getIdNavire)
+                .collect(Collectors.toSet())
+                .size() - 1 != elemPool.size();
+    }
+
     public void fixDna () {
         List<Navire> tmp = new LinkedList<>();
 
@@ -236,32 +251,26 @@ public class DNA {
 
         tmp.forEach(x -> x.setHeureDeb(x.getHeureArr()));
 
-        clearDups();
+        if(hasDups()) clearDups();
         swapFalseServTime();
         setJobTimer();
     }
 
     public boolean isValid() {
-        int elemLen = elemPool.size();
-
-        Set<String> dupsChecker = new HashSet<>();
-
         for (String p: dnaMap.keySet()) {
             if(dnaMap.get(p).isEmpty())
                 return false;
             for(Navire nvr: dnaMap.get(p)) {
                 if(nvr.getHeureDeb() < nvr.getHeureArr()
                         || isOverlapped(dnaMap.get(p), nvr.getHeureDeb(), nvr.getDureeServ())
-                        || nvr.getIdNavire().equals("0")
-                        /*|| dupsChecker.contains(nvr.getIdNavire())*/)
+                        || nvr.getIdNavire().equals("0"))
                     return false;
-
-                dupsChecker.add(nvr.getIdNavire());
             }
         }
 
         List<Navire> tmpList = flatten();
-        return tmpList.size() - 4 == elemLen && dnaMap.keySet().size() == postePool.size() ;
+
+        return tmpList.size() - postePool.size() == elemPool.size() && dnaMap.keySet().size() == postePool.size() && !hasDups();
     }
 
     public int calcFitness () {

@@ -8,7 +8,6 @@ public class Population {
 
     private final int popNumber;
     private final int elemLength;
-    private final List<String> elemPool;
     private final List<String> postePool;
     private final HashMap<DNA, Integer> popDNAs;
     private final DockData dockData;
@@ -17,10 +16,9 @@ public class Population {
     public Population(int n, DockData dockData) {
         this.popNumber = n;
         this.rand = new Random();
-        this.elemPool = dockData.getNaviresList();
         this.postePool = dockData.getPostesList();
         this.dockData = dockData;
-        this.elemLength = elemPool.size();
+        this.elemLength = dockData.getNaviresList().size();
         this.popDNAs = new HashMap<>();
     }
 
@@ -43,6 +41,26 @@ public class Population {
                 && dna.stream().filter(x -> !x.getIdNavire().equals("0")).count() != elemLength;
     }
 
+    private DNA maxFitnessDna() {
+        DNA maxDna = DNA.empty();
+        int max = Integer.MIN_VALUE;
+        for (DNA dna: popDNAs.keySet()) {
+            if(max < popDNAs.get(dna)) {
+                max = popDNAs.get(dna);
+                maxDna = dna;
+            }
+        }
+        return maxDna;
+    }
+
+    public void getNextGen() {
+        croisement();
+        mutation();
+        while (popDNAs.size() > 4) {
+            popDNAs.remove(maxFitnessDna());
+        }
+    }
+
     public boolean swapNChop (List<Navire> chrom1, List<Navire> chrom2, int i, int j) {
         List<Navire> newDna1 = new ArrayList<>(chrom1.subList(0, i));
         newDna1.addAll(chrom2.subList(i, j));
@@ -62,35 +80,15 @@ public class Population {
         DNA cross2 = DNA.fromListToDNA(newDna2, postePool, dockData);
         cross2.check();
 
-        if (cross1.isValid()) {
+        if (cross1.isValid() && cross2.isValid()) {
+            System.out.println("Croisement de : \n" + chrom1 + "\n" + chrom2 + "\nen " + i + " " + j + "\n");
+            System.out.println("Resultat : \n" + newDna1 + "\n" + newDna2 + "\n");
             popDNAs.put(cross1, cross1.calcFitness());
-        } else return false;
-
-        if (cross2.isValid()) {
             popDNAs.put(cross2, cross2.calcFitness());
+            System.out.println("Correction : \n" + cross1.flatten() + "\n" + cross2.flatten() + "\n");
         } else return false;
 
         return true;
-    }
-
-    private DNA maxFitnessDna() {
-        DNA maxDna = DNA.empty();
-        int max = Integer.MIN_VALUE;
-        for (DNA dna: popDNAs.keySet()) {
-            if(max < popDNAs.get(dna)) {
-                max = popDNAs.get(dna);
-                maxDna = dna;
-            }
-        }
-        return maxDna;
-    }
-
-    public void getNextGen() {
-        croisement();
-        mutation();
-        while (popDNAs.size() > 4) {
-            popDNAs.remove(maxFitnessDna());
-        }
     }
 
     public void croisement() {
@@ -122,23 +120,23 @@ public class Population {
                     || flattenedDna2.get(i).getIdNavire().equals("0") );
 
         } while (!swapNChop(flattenedDna1, flattenedDna2, i, j));
-        System.out.println("Croisement de : \n" + flattenedDna1 + "\n" + flattenedDna2 + "\nen " + i + " " + j);
     }
 
     public void mutation() {
         List<DNA> dnaPool = new ArrayList<>(popDNAs.keySet());
         dnaPool.remove(naturalSelection());
         DNA dna = dnaPool.get(rand.nextInt(dnaPool.size()));
-        DNA newDna = DNA.copyOf(dna);
-        do {
-            newDna.mutate();
-            popDNAs.put(newDna, newDna.calcFitness());
-        } while (!newDna.isValid());
+        System.out.println("Mutation de : \n" + dna.flatten() + "\n");
+
+        DNA mutatedDna = DNA.mutate(dna);
+
+        popDNAs.put(mutatedDna, mutatedDna.calcFitness());
+        System.out.println("Resltat : \n" + mutatedDna.flatten() + "\n");
     }
 
     public void generatePop () {
         for (int i = 0; i < popNumber; i++) {
-            var newDna = DNA.genRand(dockData);
+            DNA newDna = DNA.genRand(dockData);
             newDna.fixDna();
             popDNAs.put(newDna, newDna.calcFitness());
         }

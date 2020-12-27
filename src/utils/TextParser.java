@@ -67,7 +67,6 @@ public class TextParser {
     }
 
     public static DockData convertTextToDoc (String text) {
-        DockData.DockBuilder dock = new DockData.DockBuilder();
 
         Pattern nvrPattern = Pattern.compile("nombre de navires\\s*[=:]\\s*\\d+", Pattern.CASE_INSENSITIVE);
         Pattern pstPattern = Pattern.compile("nombre de postes d'amarrage\\s*[=:]\\s*\\d+", Pattern.CASE_INSENSITIVE);
@@ -75,7 +74,8 @@ public class TextParser {
         Pattern durPattern = Pattern.compile("(Poste\\d+\\s*:\\s*" +
                                                     "(\\w*\\s*->\\s*\\d+\\s*)+)", Pattern.CASE_INSENSITIVE);
 
-        return dock.setNbrNvr(matcherToInt(nvrPattern.matcher(text)))
+        return new DockData.Builder()
+                .setNbrNvr(matcherToInt(nvrPattern.matcher(text)))
                 .setNbrPst(matcherToInt(pstPattern.matcher(text)))
                 .setNvrTimeMap(matcherTempArr(arrPattern.matcher(text)))
                 .setTmpService(matcherToDict(durPattern.matcher(text)))

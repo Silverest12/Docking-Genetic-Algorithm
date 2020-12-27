@@ -18,28 +18,28 @@ public class DockData {
         this.tmpService = tmpService;
     }
 
-    public static class DockBuilder {
+    public static class Builder {
         private int nbrNvr;
         private int nbrPst;
         private LinkedHashMap<String, Integer> nvrTimeMap;
         private LinkedHashMap<String, HashMap<String, Integer>> tmpService;
 
-        public DockBuilder setNbrNvr(int nbrNvr) {
+        public Builder setNbrNvr(int nbrNvr) {
             this.nbrNvr = nbrNvr;
             return this;
         }
 
-        public DockBuilder setNbrPst(int nbrPst) {
+        public Builder setNbrPst(int nbrPst) {
             this.nbrPst = nbrPst;
             return this;
         }
 
-        public DockBuilder setNvrTimeMap(LinkedHashMap<String, Integer> nvrTimeMap) {
+        public Builder setNvrTimeMap(LinkedHashMap<String, Integer> nvrTimeMap) {
             this.nvrTimeMap = nvrTimeMap;
             return this;
         }
 
-        public DockBuilder setTmpService(LinkedHashMap<String, HashMap<String, Integer>> tmpService) {
+        public Builder setTmpService(LinkedHashMap<String, HashMap<String, Integer>> tmpService) {
             this.tmpService = tmpService;
             return this;
         }
