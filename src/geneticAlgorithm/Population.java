@@ -129,9 +129,11 @@ public class Population {
         System.out.println("Mutation de : \n" + dna.flatten() + "\n");
 
         DNA mutatedDna = DNA.mutate(dna);
-        if(mutatedDna.isValid()) {
+
+        if(mutatedDna.isValid() || mutatedDna.calcFitness() != dna.calcFitness()) {
             popDNAs.put(mutatedDna, mutatedDna.calcFitness());
         }
+
         System.out.println("Correction : \n" + mutatedDna.flatten() + "\n");
     }
 
