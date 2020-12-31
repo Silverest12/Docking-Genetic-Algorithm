@@ -57,7 +57,7 @@ public class TextParser {
 
     private static LinkedHashMap<String, HashMap<String, Integer>> matcherToDict (Matcher toFind) {
         LinkedHashMap<String, HashMap<String, Integer>> output = new LinkedHashMap<>();
-
+        // Poste1 -> Map < ID Navire -> duree Serv>
         while (toFind.find()) {
             String[] str = toFind.group().split("\\s*:\\s*",2);
             output.put(str[0].trim(), matcherToHashMapInt(Pattern.compile("\\w+\\s*->\\s*\\d+").matcher(str[1])));
@@ -67,7 +67,6 @@ public class TextParser {
     }
 
     public static DockData convertTextToDoc (String text) {
-
         Pattern nvrPattern = Pattern.compile("nombre de navires\\s*[=:]\\s*\\d+", Pattern.CASE_INSENSITIVE);
         Pattern pstPattern = Pattern.compile("nombre de postes d'amarrage\\s*[=:]\\s*\\d+", Pattern.CASE_INSENSITIVE);
         Pattern arrPattern = Pattern.compile("(\\w+\\s*->\\s*\\d+h\\d*\\s*)+", Pattern.CASE_INSENSITIVE);

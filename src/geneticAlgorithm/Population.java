@@ -9,6 +9,7 @@ public class Population {
     private final int popNumber;
     private final int elemLength;
     private final List<String> postePool;
+    // Chrom -> Fitness
     private final HashMap<DNA, Integer> popDNAs;
     private final DockData dockData;
     private final Random rand;
@@ -53,12 +54,19 @@ public class Population {
         return maxDna;
     }
 
-    public void getNextGen() {
-        croisement();
-        mutation();
-        while (popDNAs.size() > 4) {
-            popDNAs.remove(maxFitnessDna());
-        }
+    public void getNextGen(double pc, double pm) {
+        List<DNA> popKeys1 = new ArrayList<>(popDNAs.keySet());
+        popKeys1.remove(naturalSelection());
+        List<DNA> popKeys2 = new ArrayList<>(popKeys1);
+
+        int cItr = iterCroisement(pc);
+        int mItr = iterMut(pm);
+
+        while (cItr-- >  0) croisement(popKeys1);
+
+        while (mItr-- > 0) mutation(popKeys2);
+
+        while (popDNAs.size() > popNumber) popDNAs.remove(maxFitnessDna());
     }
 
     public boolean swapNChop (List<Navire> chrom1, List<Navire> chrom2, int i, int j) {
@@ -91,17 +99,16 @@ public class Population {
         return true;
     }
 
-    public void croisement() {
-        List<DNA> dnaPool = new ArrayList<>(popDNAs.keySet());
-        dnaPool.remove(naturalSelection());
+    public void croisement(List<DNA> dnaPool) {
         List<Navire> flattenedDna1, flattenedDna2;
 
         int i, j;
+        DNA dna1, dna2;
 
         do {
-            DNA dna1 = dnaPool.get(rand.nextInt(dnaPool.size()));
+            dna1 = dnaPool.get(rand.nextInt(dnaPool.size()));
             dnaPool.remove(dna1);
-            DNA dna2 = dnaPool.get(rand.nextInt(dnaPool.size()));
+            dna2 = dnaPool.get(rand.nextInt(dnaPool.size()));
             dnaPool.add(dna1);
 
             flattenedDna1 = dna1.flatten();
@@ -120,14 +127,14 @@ public class Population {
                     || flattenedDna2.get(i).getIdNavire().equals("0") );
 
         } while (!swapNChop(flattenedDna1, flattenedDna2, i, j));
+        dnaPool.remove(dna1);
+        dnaPool.remove(dna2);
     }
 
-    public void mutation() {
-        List<DNA> dnaPool = new ArrayList<>(popDNAs.keySet());
-        dnaPool.remove(naturalSelection());
+    public void mutation(List<DNA> dnaPool) {
         DNA dna = dnaPool.get(rand.nextInt(dnaPool.size()));
         System.out.println("Mutation de : \n" + dna.flatten() + "\n");
-
+        dnaPool.remove(dna);
         DNA mutatedDna = DNA.mutate(dna);
 
         if(mutatedDna.isValid() || mutatedDna.calcFitness() != dna.calcFitness()) {
@@ -135,6 +142,15 @@ public class Population {
         }
 
         System.out.println("Correction : \n" + mutatedDna.flatten() + "\n");
+    }
+
+    public int iterCroisement (double pc) {
+        int n = (int) ((double) popNumber * pc); //4 * 0.8 = 3,.. => 3 | 8 * 0.8 = 6,.. => 6
+        return Math.max(1, (int) ((double) (n - n % 2) / 2)); // 3 - 3 % 2 = 2 / 2 => 1 | 6 => 3
+    }
+
+    public int iterMut (double pm) {
+        return Math.max(1, (int) ((double) popNumber * pm)); // 4 * 0.1 = 0.4 => 1
     }
 
     public void generatePop () {

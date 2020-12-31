@@ -52,13 +52,13 @@ public class DNA {
         List<Navire> f;
 
         do {
-            String p1 = postePool.get(rand.nextInt(postePool.size()));
+            String p1 = postePool.get(rand.nextInt(postePool.size())); // p1 = P3
             postePool.remove(p1);
-            String p2 = postePool.get(rand.nextInt(postePool.size()));
+            String p2 = postePool.get(rand.nextInt(postePool.size())); // p2 = P2
             postePool.add(p1);
 
-            Navire nvr1 = dnaMap.get(p1).get(rand.nextInt(dnaMap.get(p1).size()));
-            Navire nvr2 = dnaMap.get(p2).get(rand.nextInt(dnaMap.get(p2).size()));
+            Navire nvr1 = dnaMap.get(p1).get(rand.nextInt(dnaMap.get(p1).size())); // P3 -> 7
+            Navire nvr2 = dnaMap.get(p2).get(rand.nextInt(dnaMap.get(p2).size())); // P2 -> 10
 
             dnaCopy.swapNvr(nvr1, nvr2, p1, p2);
 
@@ -132,6 +132,9 @@ public class DNA {
 
             int heureDeb;
             do {
+                // 0 <= tmp <= 1440 - dureeDeService
+                // HeureDeb < Heure d'arrivee
+                // heure < HeureDeb Nn + duree Service Nn
                 heureDeb = rand.nextInt(1440 - n.getDureeServ());
             } while (heureDeb < n.getHeureArr() || isOverlapped(dnaMap.get(poste), heureDeb, n.getDureeServ()));
 
@@ -286,6 +289,7 @@ public class DNA {
         return false;
     }
 
+    // List (N1, N2, N3, .. N10) -> List (N1, N3 .. N10) -> ... -> List()
     private Navire generateRandomNav (List<String> elemPoolCopy, String poste) {
         String addr;
         int heureArr;
